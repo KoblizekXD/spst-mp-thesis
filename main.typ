@@ -21,10 +21,11 @@
 #show math.equation: set text(size: 16pt)
 #set figure(gap: 1.5em)
 #show figure: set block(below: 16pt, above: 16pt)
-#set par(leading: 0.75em, spacing: 0.75em + 6pt, justify: true)
+#set par(leading: 1.2em, spacing: 0.75em + 6pt, justify: true)
 #show heading.where(level: 1): set text(size: 20pt, weight: "bold")
 #show heading.where(level: 2): set text(size: 16pt, weight: "bold")
 #show heading.where(level: 3): set text(size: 14pt, weight: "bold")
+#show heading: set block(below: 20pt, above: 20pt)
 #show figure.where(kind: "code"): set figure(supplement: "Výpis")
 #set align(center)
 
