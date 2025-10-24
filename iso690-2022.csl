@@ -730,6 +730,7 @@
               <text macro="url"/>
               <text variable="note"/>
             </group>
+            <text macro="accessed"/>
           </else-if>
           <else-if type="thesis">
             <group delimiter=". " suffix=". ">

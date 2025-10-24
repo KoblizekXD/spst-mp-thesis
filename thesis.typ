@@ -23,8 +23,7 @@
     application form, dormitory, web application
   ]),
   acknowledgements: par([
-    Děkuji vedoucímu práce Ing. Matěji Brožkovi za cenné rady a odborné vedení při
-    zpracování této práce.
+    Děkuji vedoucímu práce Mgr. Matěji Brožkovi za cenné rady a odborné vedení při zpracování této práce.
   ]),
   assignment: [
     #par([
@@ -69,6 +68,73 @@
 
 #set heading(numbering: "1.1")
 
-= Teoretická část
+= Problematika stávajícího řešení
 
+Jak již bylo zmíněno v úvodu, aktuální stav systému pro přihlašování a správu přihlášek pro
+domov mládeže je neoptimální a obsahuje množství funkcí, které lze implementovat pro celkové
+zlepšení uživatelské přívětivosti a pohodlnosti. Pro jednoduché ustanovaní těchto funkcí
+je však se potřeba podívat na všechny typy, které kdy byly zvažovány pro použití a následně
+tato data zohlednit při návrhu nového systému.
 
+== Fyzické přihlášky
+
+Fyzické přihlášky, také zvané papírové přihlášky, jsou již dnes považovány za staromódní,
+avšak je potřeba si z nich vzít důležité poznámky o tom, jaké nevýhody přinášeli a ty následně zvážit
+při implementaci našeho řešení.
+
+Při porovnání s ostatními řešeními mají bezkonkurenčně nejvíce nevýhod. Mezi nevýhody definitivně patří:
+- Nutnost fyzického doručení přihlášky na určené místo, což může být pro některé žadatele komplikované.
+- Obtížná správa a archivace papírových přihlášek. Papírové dokumenty se těžce hledají, třídí a uchovávají, což dokáže zvýšit administrativní zátěž pro vychovatele.
+- Omezené možnosti pro automatizaci procesu hodnocení a kalkukace bodů na základě odpovědí žadatelů.
+
+== Google Forms
+
+Google Forms je online nástroj pro tvorbu formulářů, sběr a statistiku dat.
+Nabízí široké možnosti přizpůsobení formulářů, integraci s dalšími službami Google a automatické shromažďování odpovědí do přehledných tabulek.
+@google-forms
+
+Mezi hlavní výhody Google Forms patří hlavně intuitivní uživatelské rozhraní, jednoduché
+nastavení a možnost rychlého sdílení formulářů prostřednictvím odkazu. Dále nabízí
+automatický export dat do tabulek. Všechny tyto funkce výrazně usnadňují přihlašovací proces, avšak přichází i funkce které jsou vitální a chybí. Pro školní rok 2025/2026 byly
+Google Forms pilotně využity jako nástroj pro sběr přihlášek. Část procesu přihlašování z administrativní
+strany tvoří např. archivace přijatých přihlášek ve formátu PDF #footnote("Tento krok byl řešen automaticky za pomocí zautomatizovaného skriptu v Google Sheets, z vlastní zkušenosti bylo toto řešení však velice chybové a často se muselo upravovat."), či komunikace se žadateli. Tyto funkce však Google Forms nenabízí, což vede k nutnosti manuálního zpracování.
+
+== Externí řešení
+
+Externí řešení patří zdaleka k nejvhodnějším možnostem, jak řešit přihlašovací proces. Mezi hlavní výhody
+patří především fakt, že produkty lze přizpůsobit na míru dle požadavků a potřeb domova mládeže. Nabízejí
+též opravu chyb, aktualizace a technickou podporu, což může být velice užitečné pro zajištění hladkého chodu systému. Mezi nevýhody však patří především finanční náročnost, jelikož
+externí řešení často vyžadují měsíční nebo roční poplatky za podporu a údržbu.
+
+#pagebreak()
+
+= Stanovení požadavků na novou aplikaci
+
+Při diskuzi o tvorbě nové aplikacei byly též stanoveny požadavky na funkce, které by měla aplikace
+obsahovat, odvíjely jsme se především od problémů, které přinášela stávající řešení. Tyto požadavky
+můžeme pro přehlednost rozdělit do dvou hlavních kategorií: *požadavky na uživatelské funkce* a *požadavky na administrátorské funkce*. Na základě těchto požadavků bude následně proveden výběr technologií a návrh architektury aplikace.
+
+== Uživatelské funkce
+
+- Zobrazení formuláře pro přihlášení do domova mládeže s možností vyplnění a odeslání přihlášky.
+- Možnost sledování stavu přihlášky v reálném čase prostřednictvím _ticket systému_.
+
+== Administrátorské funkce
+
+- Zobrazení přehledu všech přijatých přihlášek s možností filtrování, či přidávání poznámek.
+- Možnost komunikace se žadateli prostřednictvím integrované funkce pro zasílání zpráv za pomoci e-mailu.
+- Automatické bodování přihlášek na základě odpovědí žadatelů.
+- Generování a archivace přijatých přihlášek společně s možností exportu do PDF.
+- Možnost úpravy formuláře pro přihlášení dle aktuálních potřeb.
+- Zabezpečení přístupu k administrátorským funkcím pomocí autentizačního systému s RBAC #footnote([
+  Role-Based Access Control @decoding-rbac
+]), který zajistí různé úrovně přístupu pro různé role vychovatelů.
+
+== Ideální proces přihlašování
+
+= Technologie použité při vývoji
+== Next.js
+== PostgreSQL
+== Prisma ORM
+== TypeScript
+== TailwindCSS
