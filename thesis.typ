@@ -19,10 +19,10 @@
     The practical part discusses the implementation of the project itself, the strategies used during development, and the process of deploying the application on the server of the Secondary Technical School in Třebíč.
   ]),
   keywords-cs: par([
-    přihlašovací formulář, domov mládeže, webová aplikace
+    přihlašovací formulář, domov mládeže, webová aplikace, React, Next.js
   ]),
   keywords-en: par([
-    application form, dormitory, web application
+    application form, dormitory, web application, React, Next.js
   ]),
   acknowledgements: par([
     Děkuji vedoucímu práce Mgr. Matěji Brožkovi za cenné rady a odborné vedení při zpracování této práce.
@@ -119,7 +119,9 @@ můžeme pro přehlednost rozdělit do dvou hlavních kategorií: *požadavky na
 == Uživatelské funkce
 
 - Zobrazení formuláře pro přihlášení do domova mládeže s možností vyplnění a odeslání přihlášky.
-- Možnost sledování stavu přihlášky v reálném čase prostřednictvím _ticket systému_.
+- Možnost sledování stavu přihlášky v reálném čase prostřednictvím ovládacího panelu.
+- Automatické zasílání notifikací e-mailem při změně stavu přihlášky (např. přijetí, zamítnutí).
+- Využití stejného uživatelského účtu ve více ročnících bez nutnosti nové registrace.
 
 == Administrátorské funkce
 
@@ -127,9 +129,8 @@ můžeme pro přehlednost rozdělit do dvou hlavních kategorií: *požadavky na
 - Možnost komunikace se žadateli prostřednictvím integrované funkce pro zasílání zpráv za pomoci e-mailu.
 - Automatické bodování přihlášek na základě odpovědí žadatelů.
 - Generování a archivace přijatých přihlášek společně s možností exportu do PDF.
-- Možnost úpravy formuláře pro přihlášení dle aktuálních potřeb.
 - Zabezpečení přístupu k administrátorským funkcím pomocí autentizačního systému s RBAC #footnote([
-    Role-Based Access Control je systém pro efektivní správu přístupu k zabezpečeným informacím pomocí rolí a oprávnění. @decoding-rbac
+    Role-Based Access Control je systém pro efektivní správu přístupu k zabezpečeným informacím pomocí rolí a oprávnění @decoding-rbac.
   ]), který zajistí různé úrovně přístupu pro různé role vychovatelů.
 
 #pagebreak()
@@ -213,14 +214,14 @@ základě jejich výhod a existujících zkušeností.
 
 == TypeScript
 
-TypeScript je programovací jazyk, který je nadstavbou JavaScriptu a přidává mu statické typování. To přidává řadu výhod, jako např. bezpečné typy, či lepší čitelnost kódu. @typescriptlang
+TypeScript je programovací jazyk, který je nadstavbou JavaScriptu a přidává mu statické typování. To přidává řadu výhod, jako např. bezpečné typy, či lepší čitelnost kódu @typescriptlang.
 
 #figure(
   ```ts
   const greeting: string = "Ahoj, Světe!";
   console.log(greeting);
   ```,
-  kind: "code",
+  kind: "raw",
   caption: "Ukázka kódu v TypeScriptu",
 )
 
@@ -230,17 +231,17 @@ ve většině moderních vývojových nástrojů, což usnadňuje práci vývoj�
 == Next.js
 
 Next.js je webový framework, který je postaven na Reactu a umožňuje tvorbu kompletních webových aplikací s podporou pokročilých funkcí, jako je *Server-Side Rendering* (SSR), nebo
-*Server Actions*. @nextjs
+*Server Actions* @nextjs.
 
 #pagebreak()
 
 === React
 
-React je knihovna pro tvorbu uživatelských rozhraní, který umožňuje vytváření komponent založených na stavech a vlastnostech přímo v JavaScriptu či TypeScriptu. @reactjs
+React je knihovna pro tvorbu uživatelských rozhraní, který umožňuje vytváření komponent založených na stavech a vlastnostech přímo v JavaScriptu či TypeScriptu @reactjs.
 Jedná se o jeden z nejpoužívanějších nástrojů pro vývoj webových aplikací. Díky přímé integraci
 v Next.js umožňuje efektivní tvorbu dynamických a interaktivních uživatelských rozhraní.
 
-React umožňuje tvorbu _znovupoužitelných komponent_. Tyto komponenty jsou prosté funkce nebo třídy #footnote("V moderním Reactu je doporučeno používat výhradně funkční komponenty."), které přijímají vstupní data(_props_, též známo v HTML jako atributy). Komponenty mohou také spravovat svůj vlastní stav -- _state_, což umožňuje vytváření interaktivních prvků uživatelského rozhraní.
+React umožňuje tvorbu _znovupoužitelných komponent_. Tyto komponenty jsou prosté funkce nebo třídy #footnote("V moderních verzích knihovny React je doporučeno používat výhradně funkční komponenty."), které přijímají vstupní data(_props_, též známo v HTML jako atributy). Komponenty mohou také spravovat svůj vlastní stav -- _state_, což umožňuje vytváření interaktivních prvků uživatelského rozhraní.
 
 Každý soubor s příponou `.tsx` nebo `.jsx` představuje soubor podporující speciální syntaxi JSX, ta umožňuje
 kombinovat kód podobný HTML přímo do JavaScriptu/TypeScriptu. Tento kód je následně přeložen do nativního JavaScriptu, který je vykonáván v prohlížeči.
@@ -264,7 +265,7 @@ kombinovat kód podobný HTML přímo do JavaScriptu/TypeScriptu. Tento kód je 
     );
   }
   ```,
-  kind: "code",
+  kind: "raw",
   caption: "Ukázka komponenty v Reactu",
 )
 
@@ -314,7 +315,7 @@ komponenta, ta dokáže zobrazit náhradní obsah (např. indikátor načítán�
   }
 
   ```,
-  kind: "code",
+  kind: "raw",
   caption: "Ukázka React Server Component a jejího použití s Suspense",
 )
 
@@ -322,7 +323,7 @@ komponenta, ta dokáže zobrazit náhradní obsah (např. indikátor načítán�
 
 === Server Actions v Next.js
 
-Server Actions(česky Serverové akce nebo Funkce na straně serveru) nahrazují potřebu vytváření samostatné API na serveru, kterou by bylo nutné z klientské strany volat. Místo toho lze funkce, jež jsou definovány ve speciálním souboru
+Server Actions (česky Serverové akce nebo Funkce na straně serveru) nahrazují potřebu vytváření samostatné API na serveru, kterou by bylo nutné z klientské strany volat. Místo toho lze funkce, jež jsou definovány ve speciálním souboru
 volat přímo z komponent na straně klienta. Next.js interně automaticky vytvoří potřebné API na pozadí.@nextjs-server-actions
 
 Jako příklad můžeme vytvořit jednoduchou funkci, jejíž úkolem bude vrátit aktuální čas ze serveru. Server Actions jsou definovány v souborech které začínájí direktivou `"use server"`.
@@ -335,7 +336,7 @@ Jako příklad můžeme vytvořit jednoduchou funkci, jejíž úkolem bude vrát
     return new Date().toISOString();
   }
   ```,
-  kind: "code",
+  kind: "raw",
   caption: "Ukázka Server Action v Next.js",
 )
 
@@ -353,7 +354,7 @@ Funkci lze následně importovat a volat přímo z komponenty na straně klienta
     return <div>Aktuální čas ze serveru: {cas}</div>;
   }
   ```,
-  kind: "code",
+  kind: "raw",
   caption: "Ukázka komponenty v Next.js využívající Server Action",
 )
 
@@ -363,7 +364,7 @@ Funkci lze následně importovat a volat přímo z komponenty na straně klienta
 
 Prisma je moderní ORM (Object-Relational Mapping) nástroj pro TypeScript,
 který slouží k interakcemi s databází za pomocí automaticky generovaného
-typovaného API. @prisma-orm
+typovaného API @prisma-orm.
 
 Jedná se o jednu z nejpopulárnějších možností pro práci s databázemi v TypeScriptu,
 a díky své jednoduchosti pro vykonávání jednoduchých CRUD operací byla ideální volbou
@@ -381,7 +382,7 @@ Prisma následně na základě tohoto schématu generuje typované API pro inter
     name     String?
   }
   ```,
-  kind: "code",
+  kind: "raw",
   caption: [Ukázka schématu databáze v Prisma ORM s modelem `User`],
 )
 
@@ -395,23 +396,101 @@ Prisma následně na základě tohoto schématu generuje typované API pro inter
     }
   });
   ```,
-  kind: "code",
+  kind: "raw",
   caption: [Ukázka použití generovaného kódu pro práci s modelem `User`],
 )
 
-Prisma podporuje širokou škálu databázových systému, včetně PostgreSQL, MySQL, SQLite a dalších. @prisma-orm
+Prisma podporuje širokou škálu databázových systému, včetně PostgreSQL, MySQL, SQLite a dalších @prisma-orm.
 
 #pagebreak()
 
 === PostgreSQL
 
 PostgreSQL je relační SQL databázový systém, který byl společně s Prismou zvolen jako hlavní databázové řešení pro tento projekt. Jedná se o jeden z nejpoužívanějších databázových systémů s pokročilými funkcemi, jako je podpora transakcí, bezpečnost pomocí
-Row-Level Security (RLS), pokročilé datové typy (JSON, UUID), či Full-Text Search.
+Row-Level Security (RLS), pokročilé datové typy (JSON, UUID), či _Full-Text Search_.
 
 == TailwindCSS
 
 TailwindCSS je podpůrný CSS framework pro moderní webový vývoj, který umožňuje rychlé
-a efektivní vytváření uživatelských rozhraní za pomocí tříd s předdefinovanými styly. @tailwindcss
+a efektivní vytváření uživatelských rozhraní za pomocí tříd s předdefinovanými styly @tailwindcss.
 
 TailwindCSS umožňuje vývojářům vytvářet responzivní a přizpůsobitelná rozhraní bez nutnosti psaní vlastního CSS kódu od nuly. Poskytuje širokou škálu tříd, které pokrývají
 různé aspekty stylování, jako je rozvržení, barvy, responzivita, typografie a další.
+
+= Implementace webové aplikace
+
+== Inicializace aplikace
+
+Při prvním spuštění aplikace dojde k takzvanému _bootstrappingu_ aplikace. Tento proces zahrnuje kroky nutné pro funkce aplikace, jako je připojení k databázi, načtení
+konfiguračních proměnných, či vytvoření základních struktur potřebných pro běh aplikace.
+
+Tento krok také vytvoří výchozího administrátora (hlavního vychovatele) aplikace, pokud v databázi ještě žádný neexistuje. Uživatel je vytvořen na základě konfiguračních proměnných, které jsou nastaveny v souboru `.env` v kořenovém adresáři projektu.
+
+== Přihlášovací formulář a autentizace
+
+Po úvodním otevření aplikace je uživatel automaticky přesměrován na přihlašovací stránku, kde se lze přihlásit, nebo zaregistrovat nový účet. Pro úspěšnou registraci je potřeba zadat platnou e-mailovou adresu, uživatelské jméno a heslo. Uživatel má téže možnost si vybrat, zda-li si má prohlížeč zapamatovat heslo pro příští návštěvy aplikace. Po úspěšné registraci je uživatel přesměrován do samotného uživatelského rozhraní aplikace.
+
+Pokud uživatel již účet má, může se přihlásit zadáním e-mailové adresy a hesla. V případě
+zadání neplatných údajů je uživatel informován o chybě a je vyzván k opětovnému zadání správných údajů.
+
+=== Autentizace a autorizace pomocí knihovny Better Auth
+
+Pro implementaci přihlašovacího formuláře, autentizace i autorizace byla zvolena knihovna Better Auth #footnote("https://www.better-auth.com/"). Ta nabízí jednoduché a rychlé řešení přihlašování v aplikacích postavených na nejen Reactu a Next.js. Better Auth využívá session-based autentizace, takže jsou do cookies ukládány session identifikátor, které server ověřuje při každém požadavku.
+
+Knihovna je modulární a podporuje přidávání _pluginů_, které rozšiřují její funkce. Jedním z těchto pluginů je i plugin pro podporu RBAC, který umožňuje definovat různé role uživatelů a jejich oprávnění v aplikaci. Aplikace byla rozdělena na 3 hlavní role:
+
+- `guest` (žadatel) -- role pro běžného uživatele, tento uživatel vidí pouze do žadatelského rozhraní a nemá přístup k serverové API.
+- `user` (vychovatel) -- role pro vychovatele domova mládeže, uživatel s touto rolí vidí administrátorské rozhraní a má částečný přístup k serverovému API. Některé funkce, jako například konfigurace aplikace, archivace, nebo správa uživatelů jsou omezeny.
+- `admin` (administrátor -- hlavní vychovatel) -- role pro hlavního vychovatele domova mládeže, uživatel s touto rolí má plný přístup k administrátorskému rozhraní a serverovému API. Může spravovat uživatele, nastavovat konfiguraci aplikace a provádět další administrativní úkony.
+
+#pagebreak()
+
+==== Middleware pro ochranu veřejné API
+
+Je nutno zmínit, že aplikace obsahuje API, kterou lze dosáhnout z veřejné sítě. Tato
+API je vygenerovaná Next.js z Serverových akcí a je tedy přístupná z klientské části aplikace. Tuto API je nutno ochránit před neoprávněným přístupem, což je zajištěno
+pomocí knihovny Next-Safe-Action #footnote("https://next-safe-action.dev/") (dále již jen jako NSA).
+
+NSA je knihovna, která abstrahuje serverové akce v Next.js a přidává jim možnost validace, zachycování chyb a zachycování požadavků za chodu@next-safe-action.
+
+V konfiguraci NSA lze použít funkci `.use()` pro definování _middleware_ (prostředník pro zachycování požadavků). Tento _middleware_ je vykonán před samotnou serverovou akcí a může být použit pro různé účely, jako je kontrola autentizace uživatele, logování požadavků, či manipulace s daty požadavku.
+
+== Rozhraní pro žadatele
+
+V režimu žadatele, tedy uživatele s rolí `guest`, má uživatel přístup k velmi omezeným funkcím samotné aplikace.
+
+=== Boční navigační menu
+
+Boční navigační menu je hlavním navigačním prvkem aplikace. Umožňuje uživateli přístup k různým sekcím aplikace, jako je přehled přihlášek, možnosti uživatele,
+nebo odhlášení z aplikace. Navigační menu je navrženo tak, aby bylo responzivní vůči různým velikostem obrazovky a zařízení.
+
+=== Sekce _Moje přihlášky_
+
+V sekci _Moje přihlášky_ lze vytvářet nové přihlášky, prohlížet si již vytvořené přihlášky a sledovat jejich stav. Vytvořené přihlášky jsou rozděleny do zobrazovacích karet, které obsahují rozkliknutelné karty s přehledem informací o přihlášce, jako je datum vytvoření, stav přihlášky a počet získaných bodů, a další.
+
+=== Formulář pro vytvoření přihlášky
+
+Formulář pro vytvoření přihlášky je dostupný po kliknutí na tlačítko _Nová přihláška_ v sekci _Moje přihlášky_. Na formulář se uživatel nedostane, pokud 
+je v administrátorském panelu nastaveno, že přihlášky nejsou momentálně přijímány, nebo již vypršela lhůta pro podání přihlášky.
+
+Formulář obsahuje několik sekcí, které pokrývají různé části přihlášky: údaje o žadateli, údaje o zákonných zástupcích a další otázky týkající se přihlášky. Každá sekce obsahuje různé typy vstupních polí, jako jsou textová pole, výběrové seznamy, přepínače a další. Pro postoupení do další sekce je vždy potřeba vyplnit všechna povinná pole tak, aby podléhala schématu validace. Po úspěšném vyplnění všech sekcí a odeslání formuláře je přihláška uložena do databáze a uživatel je přesměrován zpět do sekce _Moje přihlášky_, kde může sledovat stav své přihlášky. Přihlášku po odeslání již není možné upravovat.
+
+Při každém odeslání formuláře je formulář zařazen do ročníku, jenž je aktuálně otevřen pro přijímání přihlášek. Žadatelskému rodnému číslo je také přiřazeno číslo _evidenční_, to je automaticky vygenerováno (nebo při opětovném podání přihlášky znovu použito) na základě počtu již přijatých přihlášek v daném ročníku.
+
+=== Nastavení profilu
+
+Sekce je užita pro správu uživatelského profilu. Uživatel zde může měnit své osobní údaje, jako je jméno, e-mailová adresa a heslo. Pro změnu hesla je potřeba zadat heslo aktuální a nové heslo.
+
+== Rozhraní pro vychovatele
+
+Rozhraním pro vychovatele se rozumí administrativní část aplikace, která umožňuje spravovat přihlášky a vykonávat další administrativní úkony.
+Toto rozhraní je pouhým rozšířením uživatelského rozhraní pro žadatele, tímpádem
+má vychovatel stále přístup k podávání přihlášek, jedná změna je v úvodní obrazovce, která vychovatelům zobrazuje jednoduchou analytiku a statistiku dat o přihláškách.
+
+= Vývoj a nasazení
+== Vývojové nástroje
+=== Užití statických analýzátorů kódu
+== Plánování vývoje pomocí GitHub Issues
+== Verzovací systém Git
+=== GitHub
+== Nasazení na produkční server

@@ -26,7 +26,7 @@
 #show heading.where(level: 2): set text(size: 16pt, weight: "bold")
 #show heading.where(level: 3): set text(size: 14pt, weight: "bold")
 #show heading: set block(below: 20pt, above: 20pt)
-#show figure.where(kind: "code"): set figure(supplement: "Výpis")
+#show figure.where(kind: "raw"): set figure(supplement: "Výpis")
 #set align(center)
 
 #grid(
