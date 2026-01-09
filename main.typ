@@ -117,8 +117,8 @@
 #heading(level: 1, outlined: false, [PROHLÁŠENÍ])
 
 #par([
-  Prohlašuji, že jsem tuto práci vypracoval/a samostatně a uvedl/a v ní všechny prameny, literaturu a ostatní zdroje, které jsem použil/a. Pro vypracování této práce byla
-  použita šablona pro citování podle normy ČSN ISO 690-2022, kterou vytvořili Marta Zizienová a Adam Zizien, licencovaná pod Creative Commons Zero v1.0 Universal.
+  Prohlašuji, že jsem tuto práci vypracoval/a samostatně a uvedl/a v ní všechny prameny, literaturu a ostatní zdroje, které jsem použil/a.
+  Při přípravě této práce jsem použil ChatGPT (https://chat.openai.com/) a Github Copilot (https://github.com/features/copilot) za účelem kontroly kódu, překladů v aplikaci a hledání chyb. Po použití tohoto nástroje jsem provedl kontrolu obsahu a přebírám za něj plnou zodpovědnost.
 ])
 
 #v(3em)

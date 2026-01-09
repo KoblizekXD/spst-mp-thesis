@@ -43,6 +43,10 @@
   ],
 )
 
+#show ref.where(
+  form: "normal"
+): set ref(supplement: "kapitola")
+
 = Úvod
 
 
@@ -407,7 +411,7 @@ Prisma podporuje širokou škálu databázových systému, včetně PostgreSQL, 
 === PostgreSQL
 
 PostgreSQL je relační SQL databázový systém, který byl společně s Prismou zvolen jako hlavní databázové řešení pro tento projekt. Jedná se o jeden z nejpoužívanějších databázových systémů s pokročilými funkcemi, jako je podpora transakcí, bezpečnost pomocí
-Row-Level Security (RLS), pokročilé datové typy (JSON, UUID), či _Full-Text Search_.
+Row-Level Security (RLS), pokročilé datové typy (JSON, UUID), či _Full-Text Search_ (Full-textové vyhledávání).
 
 == TailwindCSS
 
@@ -419,14 +423,22 @@ různé aspekty stylování, jako je rozvržení, barvy, responzivita, typografi
 
 = Implementace webové aplikace
 
+== Návrh databáze a datového modelu
+
+Jak již bylo zmíněno v kapitole o použitých technologiích, pro práci s databází byla zvolena ORM Prisma. Samotný databázový model pak vychází z výchozího modelu používaného knihovnou Better Auth (viz @auth-betterauth). Tento model byl následně rozšířen o další sloupce a tabulky, které byly za potřeba pro implementace webové aplikace.
+
+*TODO DOPLNIT SCHEMA DATABAZE*
+
+Pro validaci většiny vstupních dat (klientských i serverových), která jsou později zasazena do databázového modelu byla použita knihovna Zod #footnote("https://zod.dev/"). Ta umožňuje definovat schémata pro validaci dat a poskytuje jednoduché API pro ověřování datových struktur. Zod je plně kompatibilní s TypeScriptem a je použit jak na straně klienta, tak i na straně serveru. Na straně serveru je Zod použit primárně v kombinaci s Next-Safe-Action (viz @nsa-middleware) pro validaci dat přicházejících z klienta.
+
 == Inicializace aplikace
 
 Při prvním spuštění aplikace dojde k takzvanému _bootstrappingu_ aplikace. Tento proces zahrnuje kroky nutné pro funkce aplikace, jako je připojení k databázi, načtení
 konfiguračních proměnných, či vytvoření základních struktur potřebných pro běh aplikace.
 
-Tento krok také vytvoří výchozího administrátora (hlavního vychovatele) aplikace, pokud v databázi ještě žádný neexistuje. Uživatel je vytvořen na základě konfiguračních proměnných, které jsou nastaveny v souboru `.env` v kořenovém adresáři projektu.
+Tento krok také vytvoří výchozí administrátorský účet (hlavního vychovatele) aplikace, pokud v databázi ještě žádný neexistuje. Uživatel je vytvořen na základě konfiguračních proměnných, které jsou nastaveny v souboru `.env` v kořenovém adresáři projektu.
 
-== Přihlášovací formulář a autentizace
+== Přihlášovací formulář a autentizace<auth-betterauth>
 
 Po úvodním otevření aplikace je uživatel automaticky přesměrován na přihlašovací stránku, kde se lze přihlásit, nebo zaregistrovat nový účet. Pro úspěšnou registraci je potřeba zadat platnou e-mailovou adresu, uživatelské jméno a heslo. Uživatel má téže možnost si vybrat, zda-li si má prohlížeč zapamatovat heslo pro příští návštěvy aplikace. Po úspěšné registraci je uživatel přesměrován do samotného uživatelského rozhraní aplikace.
 
@@ -439,19 +451,17 @@ Pro implementaci přihlašovacího formuláře, autentizace i autorizace byla zv
 
 Knihovna je modulární a podporuje přidávání _pluginů_, které rozšiřují její funkce. Jedním z těchto pluginů je i plugin pro podporu RBAC, který umožňuje definovat různé role uživatelů a jejich oprávnění v aplikaci. Aplikace byla rozdělena na 3 hlavní role:
 
-- `guest` (žadatel) -- role pro běžného uživatele, tento uživatel vidí pouze do žadatelského rozhraní a nemá přístup k serverové API.
+- `guest` (žadatel) -- role pro běžného uživatele, tento uživatel vidí pouze do žadatelského rozhraní a nemá přístup k většině serverové API.
 - `user` (vychovatel) -- role pro vychovatele domova mládeže, uživatel s touto rolí vidí administrátorské rozhraní a má částečný přístup k serverovému API. Některé funkce, jako například konfigurace aplikace, archivace, nebo správa uživatelů jsou omezeny.
 - `admin` (administrátor -- hlavní vychovatel) -- role pro hlavního vychovatele domova mládeže, uživatel s touto rolí má plný přístup k administrátorskému rozhraní a serverovému API. Může spravovat uživatele, nastavovat konfiguraci aplikace a provádět další administrativní úkony.
 
-#pagebreak()
-
-==== Middleware pro ochranu veřejné API
+==== Middleware pro ochranu veřejné API<nsa-middleware>
 
 Je nutno zmínit, že aplikace obsahuje API, kterou lze dosáhnout z veřejné sítě. Tato
 API je vygenerovaná Next.js z Serverových akcí a je tedy přístupná z klientské části aplikace. Tuto API je nutno ochránit před neoprávněným přístupem, což je zajištěno
 pomocí knihovny Next-Safe-Action #footnote("https://next-safe-action.dev/") (dále již jen jako NSA).
 
-NSA je knihovna, která abstrahuje serverové akce v Next.js a přidává jim možnost validace, zachycování chyb a zachycování požadavků za chodu@next-safe-action.
+NSA je knihovna, která abstrahuje serverové akce v Next.js a přidává jim možnost validace, zachycování chyb a zachycování požadavků za chodu @next-safe-action.
 
 V konfiguraci NSA lze použít funkci `.use()` pro definování _middleware_ (prostředník pro zachycování požadavků). Tento _middleware_ je vykonán před samotnou serverovou akcí a může být použit pro různé účely, jako je kontrola autentizace uživatele, logování požadavků, či manipulace s daty požadavku.
 
@@ -485,11 +495,54 @@ Sekce je užita pro správu uživatelského profilu. Uživatel zde může měnit
 
 Rozhraním pro vychovatele se rozumí administrativní část aplikace, která umožňuje spravovat přihlášky a vykonávat další administrativní úkony.
 Toto rozhraní je pouhým rozšířením uživatelského rozhraní pro žadatele, tímpádem
-má vychovatel stále přístup k podávání přihlášek, jedná změna je v úvodní obrazovce, která vychovatelům zobrazuje jednoduchou analytiku a statistiku dat o přihláškách.
+má vychovatel stále přístup k podávání přihlášek a ostatním úkonům, které by za normálních okolností žadatel měl.
+
+=== Nastavení chování aplikace
+
+Nastavení aplikace se nadále dělí na několik podčástí (sekcí). Většina těchto nastavení je dostupna pouze pro uživatele s rolí _hlavní vychovatel_.
+
+==== Sekce "Obecné"
+
+Sekce obsahuje hlavní nastavení samotné aplikace, a to konkrétně:
+- *Přístup k přihlašovacímu formuláři* -- vybrání mezi možnostmi:
+  - "Otevřeno pro všechny (ignorovat uzávěrku)" -- umožňuje přístup k formuláři všem přihlášeným uživatelům.
+  - "Otevřeno pro vychovatele (ignorovat uzávěrku)" -- přístup k přihlášce je možný pouze uživatelům s rolí _user_ a vyšší.
+  - "Uzavřeno po datu konce přihlašování" -- obsah je dostupný pouze do vypršení předem stanovené lhůty.
+  - "Uzavřeno" -- k obsahu nemá přístup žádný typ uživatele.
+- *Datum konce přihlašování* -- nastavením datumu a času znemožníte přístup k formuláři po daném termínu. Toto pravidlo však vejde v platnost pouze v případě, že je přístup k formuláři nastaven na "Uzavřeno po datu konce přihlašování".
+- *Název domény* -- toto pole je pouze estetické. Vzhledem k univerzálnímu návrhu aplikace bylo přidáno toto pole, aby žadatelé dokázali jednoduše odlišit, pro jaké internátní zařízení aplikaci využívají.
+- *Potvrzení při odeslání přihlášky* -- slouží jako text, který musí uživatelé odsouhlasit před odesláním samotné přihlášky.
+
+==== Sekce "Ročníky"
+
+V této sekci lze spravovat ročníky, které jsou v aplikaci uloženy. Ročníky lze archivovat, či nastavit jako výchozí. Výchozím ročníkem se rozumí ročník, pro který se budou ukládat nové přihlášky, či generovat nová evidenční čísla. V aplikaci vždy existuje alespoň jeden ročník a ročník a také je vždy nastaven jeden ročník jako výchozí.
+
+==== Sekce "Studijní obory"
+
+Sekce sloužící pro správu studijních oborů. Každý obor má jméno, krátkou formu jména, délku studia a možnost nastavení, zda-li se jedná o obor, ve kterém začíná výuka brzy (tento fakt poté ovlivňuje samotné bodování přihlášky).
+
+==== Sekce "Účty"
+
+Sekce pro správu uživatelských účtů. Uživatelé mohou být přidáváni, odebíráni a lze upravovat jejich role.
+
+==== Sekce "E-maily"
+
+Sekce pro správu e-mailových šablon, které jsou používány pro komunikaci s žadateli. Lze také nastavit výchozího odesílatele a předmět, se kterým bude e-mail odeslán. Je nutno podotknout, že tato část neslouží pro nastavení připojení k SMTP serveru, to je řešeno pomocí konfiguračních proměnných v souboru `.env`. 
+
+=== Zobrazení přijatých přihlášek
+
+=== Archivace
+
+=== Evidenční čísla
 
 = Vývoj a nasazení
 == Vývojové nástroje
+=== Docker
 === Užití statických analýzátorů kódu
+==== Biome.js
+==== SonarQube
+=== Aktivní monitorování
+==== Grafana a Loki
 == Plánování vývoje pomocí GitHub Issues
 == Verzovací systém Git
 === GitHub
