@@ -43,10 +43,6 @@
   ],
 )
 
-#show ref.where(
-  form: "normal"
-): set ref(supplement: "kapitola")
-
 = Úvod
 
 
@@ -125,14 +121,15 @@ můžeme pro přehlednost rozdělit do dvou hlavních kategorií: *požadavky na
 - Zobrazení formuláře pro přihlášení do domova mládeže s možností vyplnění a odeslání přihlášky.
 - Možnost sledování stavu přihlášky v reálném čase prostřednictvím ovládacího panelu.
 - Automatické zasílání notifikací e-mailem při změně stavu přihlášky (např. přijetí, zamítnutí).
-- Využití stejného uživatelského účtu ve více ročnících bez nutnosti nové registrace.
+- Využití stejného uživatelského účtu pro podání více přihlášek (např. sourozenci, jiné ročníky), bez nutnosti nové registrace.
 
 == Administrátorské funkce
 
 - Zobrazení přehledu všech přijatých přihlášek s možností filtrování, či přidávání poznámek.
 - Možnost komunikace se žadateli prostřednictvím integrované funkce pro zasílání zpráv za pomoci e-mailu.
 - Automatické bodování přihlášek na základě odpovědí žadatelů.
-- Generování a archivace přijatých přihlášek společně s možností exportu do PDF.
+- Generování a archivace přijatých přihlášek společně s možností exportu do PDF, či jiných formátů.
+- Jednoduchá úprava studijních oborů a ročníků, pro minimalizaci intervence správce systému.
 - Zabezpečení přístupu k administrátorským funkcím pomocí autentizačního systému s RBAC #footnote([
     Role-Based Access Control je systém pro efektivní správu přístupu k zabezpečeným informacím pomocí rolí a oprávnění @decoding-rbac.
   ]), který zajistí různé úrovně přístupu pro různé role vychovatelů.
@@ -201,7 +198,7 @@ Oproti session-based autentizace má tento způsob hlavní nevýhodu v tom, že 
 
 === Session-based authentication
 
-Druhým hojně užívaným způsobem pro autentizaci je tzv. session-base autentizace. Tento
+Druhým hojně užívaným způsobem pro autentizaci je tzv. session-based autentizace. Tento
 styl je oproti JWT *stateful*, ukládá tedy stav přihlášeného uživatele na serveru (v databázi). Při přihlášení klient odešle požadavek na server s přihlašovacími údaji. Server ověří tyto údaje a pokud jsou správné, vytvoří novou session (relaci) pro uživatele a vygeneruje unikátní identifikátor session (session ID). Tento identifikátor je následně odeslán zpět klientovi, který si ho uloží do cookies. Při každém dalším požadavku na server klient automaticky přiloží cookies obsahující session ID. Server následně ověří platnost session ID (např. kontrolou, zda session stále existuje v databázi) a pokud je platné, povolí přístup k požadovaným zdrojům.
 
 #figure(
@@ -234,21 +231,18 @@ ve většině moderních vývojových nástrojů, což usnadňuje práci vývoj�
 
 == Next.js
 
-Next.js je webový framework, který je postaven na Reactu a umožňuje tvorbu kompletních webových aplikací s podporou pokročilých funkcí, jako je *Server-Side Rendering* (SSR), nebo
-*Server Actions* @nextjs.
+Next.js je webový framework, který je postaven na Reactu a umožňuje tvorbu kompletních webových aplikací s podporou pokročilých funkcí, jako je _Server-Side Rendering_ (SSR), nebo _Server Actions_ @nextjs.
 
 #pagebreak()
 
 === React
 
 React je knihovna pro tvorbu uživatelských rozhraní, který umožňuje vytváření komponent založených na stavech a vlastnostech přímo v JavaScriptu či TypeScriptu @reactjs.
-Jedná se o jeden z nejpoužívanějších nástrojů pro vývoj webových aplikací. Díky přímé integraci
-v Next.js umožňuje efektivní tvorbu dynamických a interaktivních uživatelských rozhraní.
+Jedná se o jeden z nejpoužívanějších nástrojů pro vývoj webových aplikací. Díky přímé integraci v Next.js umožňuje efektivní tvorbu dynamických a interaktivních uživatelských rozhraní.
 
-React umožňuje tvorbu _znovupoužitelných komponent_. Tyto komponenty jsou prosté funkce nebo třídy #footnote("V moderních verzích knihovny React je doporučeno používat výhradně funkční komponenty."), které přijímají vstupní data(_props_, též známo v HTML jako atributy). Komponenty mohou také spravovat svůj vlastní stav -- _state_, což umožňuje vytváření interaktivních prvků uživatelského rozhraní.
+React umožňuje tvorbu _znovupoužitelných komponent_. Tyto komponenty jsou prosté funkce nebo třídy #footnote("V moderních verzích knihovny React je doporučeno používat výhradně funkční komponenty."), které přijímají vstupní data (_props_, též známo v HTML jako atributy). Komponenty mohou také spravovat svůj vlastní stav -- _state_, což umožňuje vytváření interaktivních prvků uživatelského rozhraní.
 
-Každý soubor s příponou `.tsx` nebo `.jsx` představuje soubor podporující speciální syntaxi JSX, ta umožňuje
-kombinovat kód podobný HTML přímo do JavaScriptu/TypeScriptu. Tento kód je následně přeložen do nativního JavaScriptu, který je vykonáván v prohlížeči.
+Každý soubor s příponou `.tsx` nebo `.jsx` představuje soubor podporující speciální syntaxi JSX, ta umožňuje kombinovat kód podobný HTML přímo do JavaScriptu/TypeScriptu. Tento kód je následně přeložen do nativního JavaScriptu, který je vykonáván v prohlížeči.
 
 #figure(
   ```tsx
@@ -275,7 +269,7 @@ kombinovat kód podobný HTML přímo do JavaScriptu/TypeScriptu. Tento kód je 
 
 === React Server Components
 
-React Server Components (RSC) je speciální typ komponenty v React, která umožňuje
+React Server Components (RSC) je speciální typ komponenty v Reactu, která umožňuje
 vykonávání kódu komponenty na serveru místo v prohlížeči.
 V Next.js lze rozlišit RSC a běžné komponenty na straně klienty pomocí direktivy `"use client"` umístěné na začátku souboru. Pokud tato direktiva chybí, automaticky se React automaticky považuje všechny komponenty definované v daném souboru jako serverové komponenty.
 @react-server-components
@@ -288,6 +282,8 @@ interaktivní prvky(např. `onClick` události nebo `useState` hook).
 Využití samotné RSC také prodlužuje dobu načítání stránky, protože React čeká na
 dokončení obsluhy serverové komponenty před tím, než odešle výsledná data do prohlížeče klientovi. Pro zvýšení uživatelské přivětivosti (UX) existuje proto tzv. _Suspense_
 komponenta, ta dokáže zobrazit náhradní obsah (např. indikátor načítání) zatímco server čeká na dokončení vykonání RSC.
+
+RSC lze do jisté míry přirovnat ke klasickému PHP -- které kód vykonává na serveru a uživateli pošle až hotovou HTML stránku. Oproti PHP však RSC umožňuje kombinovat serverový a klientský kód v rámci jedné aplikace, což přináší větší flexibilitu a možnosti pro vývojáře.
 
 #figure(
   ```tsx
@@ -411,7 +407,7 @@ Prisma podporuje širokou škálu databázových systému, včetně PostgreSQL, 
 === PostgreSQL
 
 PostgreSQL je relační SQL databázový systém, který byl společně s Prismou zvolen jako hlavní databázové řešení pro tento projekt. Jedná se o jeden z nejpoužívanějších databázových systémů s pokročilými funkcemi, jako je podpora transakcí, bezpečnost pomocí
-Row-Level Security (RLS), pokročilé datové typy (JSON, UUID), či _Full-Text Search_ (Full-textové vyhledávání).
+Row-Level Security (RLS), pokročilé datové typy (JSON, UUID), či _Full-Text Search_ (Full-textové vyhledávání). Tyto funkce dělají PostgreSQL ideální volbou pro moderní webové aplikace.
 
 == TailwindCSS
 
@@ -531,9 +527,49 @@ Sekce pro správu e-mailových šablon, které jsou používány pro komunikaci 
 
 === Zobrazení přijatých přihlášek
 
+Vychovatelé mají přístup k přehlednému seznamu všech přihlášek. Seznam je zde implementován pomocí přehledné tabulky s podporou stránkování, filtrování a vyhledávání. Každá přihláška je zobrazena v řádku tabulky s možností rozkliknutí pro zobrazení detailních informací o přihlášce. Z této stránky lze také přihlášky mazat.
+
+==== Detail přihlášky
+
+Každou přihlášku lze rozkliknout pro zobrazení detailních informací. V detailu přihlášky jsou zobrazeny všechny informace, které žadatel zadal při vyplňování přihlášky, včetně automaticky vygenerovaného bodového ohodnocení a stavu přihlášky. Vychovatel zde má také možnost měnit stav přihlášky (např. přijatá, zamítnutá) a přidávat poznámky. V případě, že uživatel, který přihlášku vytvořil, špatně vyplnil libovolný údaj, má možnost údaj v přihlášce opravit. 
+
+==== Export přihlášek do PDF
+
+Export přihlášky do PDF formátu je poněkud záludná záležitost, jelikož generování PDF na straně serveru v prostředí Node.js není příliš, ani efektivní. Pro tento účel bylo zvoleno řešení pomocí kombinace přihlášky ve formátu XLSX a následné konverze do PDF pomocí nástroje LibreOffice.
+
+Proces generování PDF probíhá ve třech krocích:
+- Jednorázové nahrání přihláškové šablony XLSX do aplikace.
+- Při požadavku na export přihlášky je vytvořena kopie šablony, do které jsou následně vloženy údaje z přihlášky. Vložení údajů probíhá pomocí knihovna *ExcelJS*, která umožňuje manipulaci s XLSX soubory v prostředí Node.js. V šabloně jsou přepsány položky s předem definovanými názvy buněk (např. buňka s obsahem `$application_id$` bude nahrazena univerálním identifikátorem přihlášky).
+- Upravený XLSX soubor je následně vyexportován do PDF pomocí knihovny *libreoffice-convert*, který abstrahuje volání LibreOffice z příkazové řádky pro konverzi mezi různými formáty dokumentů.
+
+#figure(
+  image("res/pdf-gen-flow.png"),
+  caption: "Ukázka toku exportu přihlášky do formátu PDF"
+)
+
+Řešení pomocí mezisouboru XLSX se může zdát jako redundantní a zbytečně komplikované, avšak v současné době neexistuje žádné široce používané řešení pro vyplňování (přepisování) PDF šablon v prostředí Node.js. Tento přístup tedy představuje kompromis mezi složitostí implementace a funkčností.
+
 === Archivace
 
+V systému lze ročníky archivovat, což znamená, že přihlášky v daném ročníku již nebudou
+moci být upravovány ani přidávány nové přihlášky. Archivaci ročníků lze spravovat v sekci nastavení aplikace. Nelze aktivovat ročník, který je nastaven jako výchozí.
+
+Archivace ročníku nemá vliv na již vygenerovaná evidenční čísla přihlášek, ta zůstávají nadále platná a jsou spojena s daným ročníkem. Archivace slouží tedy převážně k ochraně dat před nechtěnými úpravami a organizaci dat v systému.
+
 === Evidenční čísla
+
+Evidenční čísla jsou unikátní identifikátory přihlášek, které mohou být generovány při odeslání přihlášky. Evidenční číslo je tvořeno kombinací prvního ročníku, ve kterém byla pro dané rodné číslo vygenerována přihláška a pořadového čísla přihlášky v daném ročníku. Tento výrok tedy implikuje, že pro každé rodné číslo, bude číslo evidenční vygenerováno pouze jednou, a při opětovném podání přihlášky v dalším ročníku, bude použito již existující evidenční číslo.
+
+#figure(
+  $2025\/1$, 
+  caption: "Příklad evidenčního čísla přihlášky (první přihláška v roce 2025)",
+)
+
+V programu lze importovat existující evidenční čísla pro předem definovaná rodná čísla. Tento import je užitečný v případech, kdy docházelo k tvoření evidenčních čísel mimo systém (např. ručně) a je potřeba tato čísla synchronizovat s databází aplikace. Import probíhá pomocí CSV souboru, který obsahuje dva sloupce -- rodné číslo a evidenční číslo.
+
+=== Massmail
+
+Massmail je funkce, která umožňuje hromadné odesílání e-mailů všem žadatelům, nebo vybraným skupinám žadatelů na základě různých kritérií (např. stav přihlášky, ročník, atd.). Tato funkce je užitečná pro komunikaci s velkým počtem žadatelů najednou, například pro informování o změnách v přijímacím řízení, nebo pro zasílání potvrzení o přijetí přihlášky. Funkce je dostupná pro všechny vychovatele a skrývá se pod položkou _Hromadné e-maily_ v bočním navigačním menu. E-maily lze posílat ve formátu prostého textu, nebo HTML.
 
 = Vývoj a nasazení
 == Vývojové nástroje
