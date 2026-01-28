@@ -421,7 +421,7 @@ různé aspekty stylování, jako je rozvržení, barvy, responzivita, typografi
 
 == Návrh databáze a datového modelu
 
-Jak již bylo zmíněno v kapitole o použitých technologiích, pro práci s databází byla zvolena ORM Prisma. Samotný databázový model pak vychází z výchozího modelu používaného knihovnou Better Auth (viz @auth-betterauth). Tento model byl následně rozšířen o další sloupce a tabulky, které byly za potřeba pro implementace webové aplikace.
+Jak již bylo zmíněno v kapitole o použitých technologiích, pro práci s databází byla zvolena ORM Prisma. Samotný databázový model pak vychází z výchozího modelu používaného knihovnou Better Auth (viz @auth-betterauth). Tento model byl následně rozšířen o další sloupce a tabulky, které byly za potřebí pro implementaci webové aplikace.
 
 *TODO DOPLNIT SCHEMA DATABAZE*
 
@@ -476,8 +476,7 @@ V sekci _Moje přihlášky_ lze vytvářet nové přihlášky, prohlížet si ji
 
 === Formulář pro vytvoření přihlášky
 
-Formulář pro vytvoření přihlášky je dostupný po kliknutí na tlačítko _Nová přihláška_ v sekci _Moje přihlášky_. Na formulář se uživatel nedostane, pokud 
-je v administrátorském panelu nastaveno, že přihlášky nejsou momentálně přijímány, nebo již vypršela lhůta pro podání přihlášky.
+Formulář pro vytvoření přihlášky je dostupný po kliknutí na tlačítko _Nová přihláška_ v sekci _Moje přihlášky_. K formuláři lze přistoupit pouze v případě, že nejsou splněny žádné podmínky pro zamezení přístupu k formuláři (např. uzávěrka přihlášek, či globální zamezení přístupu pro uživatele s rolí `guest`).
 
 Formulář obsahuje několik sekcí, které pokrývají různé části přihlášky: údaje o žadateli, údaje o zákonných zástupcích a další otázky týkající se přihlášky. Každá sekce obsahuje různé typy vstupních polí, jako jsou textová pole, výběrové seznamy, přepínače a další. Pro postoupení do další sekce je vždy potřeba vyplnit všechna povinná pole tak, aby podléhala schématu validace. Po úspěšném vyplnění všech sekcí a odeslání formuláře je přihláška uložena do databáze a uživatel je přesměrován zpět do sekce _Moje přihlášky_, kde může sledovat stav své přihlášky. Přihlášku po odeslání již není možné upravovat.
 
@@ -569,17 +568,101 @@ V programu lze importovat existující evidenční čísla pro předem definovan
 
 === Massmail
 
-Massmail je funkce, která umožňuje hromadné odesílání e-mailů všem žadatelům, nebo vybraným skupinám žadatelů na základě různých kritérií (např. stav přihlášky, ročník, atd.). Tato funkce je užitečná pro komunikaci s velkým počtem žadatelů najednou, například pro informování o změnách v přijímacím řízení, nebo pro zasílání potvrzení o přijetí přihlášky. Funkce je dostupná pro všechny vychovatele a skrývá se pod položkou _Hromadné e-maily_ v bočním navigačním menu. E-maily lze posílat ve formátu prostého textu, nebo HTML.
+_Massmail_ (neboli hromadné e-maily) je funkce, která umožňuje hromadné odesílání e-mailů všem žadatelům, nebo vybraným skupinám žadatelů na základě různých kritérií (např. stav přihlášky, ročník, atd.). Tato funkce je užitečná pro komunikaci s velkým počtem žadatelů najednou, například pro informování o změnách v přijímacím řízení, nebo pro zasílání potvrzení o přijetí přihlášky. Funkce je dostupná pro všechny vychovatele a skrývá se pod položkou _Hromadné e-maily_ v bočním navigačním menu. E-maily lze posílat ve formátu prostého textu, nebo HTML.
 
 = Vývoj a nasazení
+
+Při tvorbě projektu by měl být kladen důraz na efektivní vývojový proces, který zahrnuje nástroje pro jednodušší lokální vývoj, zajištění kvality kódu, monitorování aplikace po nasazení a automatizaci nasazení. V následující kapitole je proto popsán přesný vývojový proces, nástroje použité pro zajištění kvality kódu a samotný automatizovaný proces nasazení aplikace na produkční server.
+
+#figure(
+  image("res/development.png"),
+  caption: [Schéma procesu vývoje aplikace]
+)
+
 == Vývojové nástroje
 === Docker
+
+Ve vývojovém prostředí lze aplikaci i služby nutné pro její běh (např. databáze) spustit pomocí Dockeru. Pro tento účel je v kořenovém adresáři projektu umístěn soubor `docker-compose.dev.yml`, který definuje potřebné služby a jejich konfiguraci. Tento soubor lze použít pro rychlé a jednotné spuštění databáze Postgres a podpůrného SMTP serveru MailHog.
+
+Společně se souborem `docker-compose.dev.yml` je kořenovém adresáři projektu umístěn i soubor `Dockerfile`, který definuje sestavení samotné aplikace do Docker obrazu. Tento obraz je následně použit v `docker-compose.yml` pro spuštění aplikace v produkčním prostředí. Nutno podotknout, že na produkčním serveru je aplikace spuštěna přes _LXC kontejner_, nikoliv jako Docker kontejner. Toto rozhodnutí bylo učiněno na základě konzultace s administrátorem lokálního školního serveru.
+
 === Užití statických analýzátorů kódu
-==== Biome.js
+
+Pro zajištění kvality kódu, dodržování standardů programování a odhalování potenciálních chyb byly do vývojového procesu integrovány _nástroje pro statickou analýzu kódu_. Tyto nástroje analyzují zdrojový kód bez jeho spuštění a poskytují zpětnou vazbu vývojářům o možných problémech, jako jsou chyby v syntaxi, nedodržování konvencí, či potenciální bezpečnostní rizika, tímto se liší od analyzérů dynamických, jako jsou testy, nástroje pro analýzu výkonu (profilery) nebo ladicí nástroje (debuggery).
+
+==== Biome
+
+Biome je moderní nástroj pro statickou analýzu kódu, který podporuje různé programovací jazyky, včetně TypeScriptu. Biome nabízí funkce, jako je formátování kódu podle předem stanovených pravidel, detekce chyb v syntaxi, analýza kvality kódu podle definovaných standardů pro statickou analýzu webovách aplikací #footnote([Tato pravidla jsou často převzata z jiných nástrojů, jako je ESLint. Kompletní seznam pravidel a jejich odůvodnění lze nalézt v oficiální dokumentaci Biome.]) a další @biomejs.
+
+Součástí lokální konfigurace Biome je i integrace s verzovacím systémem Git pomocí _pre-commit hooku_. Z názvu je patrné, že se jedná o skript, nebo jinou akci, která bude vykonána před tím, než dojde k vytvoření nového _commitu_ v lokálním repoziráři. V případě Biome je tento _hook_ použit pro automatické spuštění analýzy kódu a případné opravy nalezených problémů.
+
+Další funkcí Biome je integrace s editory a vývojovými prostředími (jako je Visual Studio Code, nebo JetBrains WebStorm) pomocí rozšíření. Tato integrace umožňuje vývojářům získávat zpětnou vazbu o kvalitě kódu přímo během psaní kódu, což usnadňuje dodržování standardů a zlepšuje kvalitu kódu již v raných fázích vývoje, ještě než je samotný nástroj spuštěn manuálně.
+
+Celé nastavení Biome je uloženo v kořenovém adresáři projektu v souboru `biome.json`, kde jsou definována pravidla pro analýzu kódu, formátování a další.
+
 ==== SonarQube
+
+SonarQube je platforma pro inspekci kvality kódu v softwarových projektech. Podporuje širokou škálu programovacích jazyků, včetně TypeScriptu, a nabízí funkce jako je analýza kódu, detekce chyb, sledování metrik kvality a další @sonarqube.
+
+#figure(
+  image("res/sonarqube.png"),
+  caption: [Souhrn analýzy zdrojového kódu v SonarQube]
+)
+
+Pro integraci SonarQube do vývojového procesu byl SonarQube nasazen na vlastní server a byl vytvořen nový projekt. Pro integraci mezi repozitářem na platformě GitHub a SonarQube byla vytvořena nová _GitHub Action_, tedy automaticky vykonaný činnost. Ta je nastavena, aby se spustila při každém aktualizace zdrojového kódu na hlavní větvi repozitáře. Tato akce provede analýzu kódu pomocí SonarQube a výsledky jsou následně odeslány na server SonarQube, kde jsou dostupné pro další přehledy a analýzy.
+
 === Aktivní monitorování
-==== Grafana a Loki
-== Plánování vývoje pomocí GitHub Issues
+
+Mezi nástroje pro aktivní monitorování webových aplikací řadíme nástroje, které aktivně sledují chování aplikace v reálném čase a poskytují zpětnou vazbu o výkonu, chybách a dalších důležitých aspektech aplikace. Tyto nástroje pomáhají vývojářům identifikovat a řešit problémy (například sledováním kroků uživatele, které vedly k vyvolání chyby), optimalizovat výkon a zlepšovat uživatelskou zkušenost za běhu aplikace.
+
+==== PostHog
+
+PostHog je open-source platforma pro analýzu chování uživatelů a aktivní monitorování webových aplikací. Umožňuje vývojářům sledovat interakce uživatelů, analyzovat chování aplikace, zajišťovat neodlaďené chyby a získávat cenné informace pro optimalizaci výkonu a zlepšení uživatelské zkušenosti @posthog.
+
+PostHog byl do vývojového procesu integrován použitím oficiální knihovny. Hlavním cílem integrace bylo vytvořit možnost získávání zpětné vazby o chování uživatelů a sledování chyb, které by mohly nastat během používání aplikace. Tato integrace umožňuje lépe porozumět chybám a problémům, které uživatelé mohou zažívat. Integrací zároveň pomůžeme rychleji problémy opravovat a případně i předcházet jejich vzniku v budoucnu.
+
+#figure(image("res/posthog.png"), caption: [
+  Panel pro sledování nastalých problémů při běhu projektu v platformě PostHog
+])
+
+== Plánování vývoje pomocí GitHub Projects
+
+Správné plánování vývoje je jednou z klíčových činností pro úspěšný a nezanedbaný vývoj jakéhokolik softwarového projektu. Pro tento účel byla zvolena platforma GitHub Projects, která umožňuje vytváření projektů, úkolů a sledování jejich stavu přímo v rámci repozitáře na GitHubu @github-projects.
+
+#figure(
+  image("res/github-project.png"),
+  caption: [Plánovací tabulka pro vývoj aplikace na platformě GitHub Projects]
+)
+
+Struktura plánovací tabulky byla rozdělena do několika sloupců:
+
+- _Backlog_ -- sloupec pro úkoly, které jsou naplánovány, ale ještě nebyly zahájeny a aktuálně nejsou žádné kapacity pro jejich řešení.
+- _Ready_ -- sloupec pro úkoly, které jsou připraveny k řešení a čekají na zahájení práce.
+- _In Progress_ -- sloupec pro úkoly, na kterých se aktuálně pracuje.
+- _In Review_ -- sloupec pro úkoly, které byly dokončeny a čekají na schválení (např. kontrolou kódu).
+- _Done_ -- sloupec pro úkoly, které byly dokončeny a schváleny.
+
+Každému z úkolů je propojen s příslušnou _issue_ (problémem) nebo _pull requestem_ (žádostí o sloučení kódu) v repozitáři, což umožňuje snadné sledování pokroku a stavu jednotlivých úkolů přímo z plánovací tabulky. Zároveň je ke každému úkolu možní přiřadit různé typy štítků (labels), které pomáhají kategorizovat úkoly podle jejich povahy (např. bug, feature, enhancement) a priority.
+
+Samostatné _issues_ a _pull requesty_ jsou pak spravovány pomocí standardních funkcí platformy GitHub a lze je opět kategorizovat do štítků, ty ale nyní slouží pro identifikaci typu problému či změny, kterou daný _issue_ nebo _pull request_ řeší (například problém se štítkem `ui/ux` značí problém, který se týká uživatelského rozhraní).
+
 == Verzovací systém Git
-=== GitHub
+
+Git je distribuovaný verzovací systém, který umožňuje sledování změn v souborech a koordinaci práce mezi více vývojáři na jednom projektu @git-scm. Pro tento projekt byl zvolen Git jako hlavní nástroj pro správu verzí kódu, jelikož je nabízí širokou škálu funkcí pro efektivní spolupráci a správu kódu, zároveň je dobře integrován s platformou GitHub, která slouží jako hostitelská služba pro repozitář projektu. Git zároveň patří mezi nejrozšířenější verzovací systémy, které jsou v současnosti používány ve vývoji softwaru @stackoverflow-survey-git.
+
 == Nasazení na produkční server
+
+Nasazení aplikaci na produkční systém probíhá pomocí automazivaného procesu, který je spuštěn při každé aktualizaci hlavní větve v repozitáři na platformě GitHub. Tento proces je implementován pomocí _GitHub Actions_, což je nástroj pro automatizaci pracovních postupů přímo v rámci platformy GitHub @github-actions.
+
+V prvním kroku je pomocí _GitHub Action_ sestaven výsledný obraz aplikaci. V následujícím kroku je tento obraz odeslán na servery GitHubu jako výsledný _artifakt_ (výstupní soubor). Akce poté pošle HTTP požadavek na produkční server, požadavek je zpracován, a server si stáhne výsledný obraz ze serveru GitHubu ve formátu ZIP. Obraz je extrahován do složky určené pro aplikaci. Následně je zastavena aktuálně běžící instance aplikace (pokud nějaká běží) pomocí softwaru PM2 a je spuštěna nová instance aplikace nově staženého obrazu. Tento proces zajišťuje, že aplikace je vždy nasazena ve své nejnovější verzi po každé aktualizaci hlavní větve v repozitáři.
+
+=== Architektura produkčního serveru
+
+Produkční server je hostován jako LXC kontejner na hlavním školním serveru. Tento kontejner je nakonfigurován tak, aby poskytoval izolované prostředí pro běh aplikace, což zajišťuje bezpečnost a stabilitu aplikace. Kontejner obsahuje všechny potřebné závislosti a konfigurace pro běh aplikace, včetně databázového serveru PostgreSQL a přístupu na SMTP server pro odesílání e-mailů.
+
+Pro přístup z internetu je v kontejneru nakonfigurována reverzní proxy pomocí nástroje Nginx. Tato proxy přijímá příchozí HTTP(S) požadavky a přeposílá je na služby běžící uvnitř kontejneru (samotná aplikace a služba pro znovunasazení aplikace -- rozhodnutí probíhá na základě URL cesty, pro přístup ke službe znovunasazení je potřeba se příslušně ověřit).
+
+#figure(
+  image("res/prod-server.png"),
+  caption: [Schéma architektury produkčního serveru]
+)
